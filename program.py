@@ -1,14 +1,9 @@
-# hawk3ye_survey.py
-
 import os
 import cv2
 import numpy as np
 import pandas as pd
 import math
 
-# --- 1. CONFIGURATION ---
-# IMPORTANT: Update these values based on your drone and site data
-# CAMERA PARAMETERS (iPhone Camera)
 FOCAL_LENGTH_PIXELS = 4000  # Placeholder - Must be accurately calibrated!
 KNOWN_DRONE_FLIGHT_HEIGHT_M = 100  # Height the drone flies at, in meters
 KNOWN_REFERENCE_OBJECT_HEIGHT_M = 1.0  # e.g., a known surveying pole on the ground
@@ -54,33 +49,12 @@ def estimate_height_and_wind_shear(image_path, reference_pixel_height=None):
         object_pixel_height = h
         
         if reference_pixel_height is None:
-            # Method A: Use Drone's known flight height (less accurate for ground objects)
-            # The Ground Sampling Distance (GSD) is approximated here.
-            # GSD = (sensor_height * flight_height) / focal_length_mm
-            # Simplified Pixel-to-Meter Scale Factor at the known flight height (H)
-            # Scale Factor (M/Pixel) = Real_World_Reference_Size_M / Pixel_Reference_Size_P
-            # We assume a fixed scale factor derived from known parameters for simplicity.
-            # For a wind turbine in an aerial image, this is highly complex, so a reference object is needed.
-            
-            # --- For this simplified code, we must use a scale factor derived from a reference object ---
-            # **IMPORTANT: The image processing step (contour detection) needs significant tuning/ML** # for reliable, consistent object and reference pole detection in real-world drone images.
-            # We'll rely on the simplified method from your sample output slide for this demo.
-            
-            # Since no reference_pixel_height is passed, this is a placeholder for better code structure.
             print("INFO: Performing Height Estimation without a ground reference pixel. Accuracy may be low.")
             # A simple factor for demonstration - needs real world calibration
             scale_factor_m_per_pixel = KNOWN_REFERENCE_OBJECT_HEIGHT_M / 100 # Assuming 1m object is 100 pixels in this resized image
             estimated_real_height = object_pixel_height * scale_factor_m_per_pixel
             
         else:
-            # Method B: Use a ground-based reference object (better for height)
-            # Real_Height = (Object_Pixel_Height / Reference_Pixel_Height) * Known_Reference_Height_M
-            # Assuming the largest contour IS the reference object for calibration:
-            
-            # --- The following logic should be integrated with an Object Detection (YOLO/HAAR) system ---
-            # For the purpose of providing a functional Python file:
-            
-            # Use the known reference object's pixel height to establish the scale
             scale_factor = KNOWN_REFERENCE_OBJECT_HEIGHT_M / reference_pixel_height
             estimated_real_height = object_pixel_height * scale_factor
         
@@ -91,32 +65,12 @@ def estimate_height_and_wind_shear(image_path, reference_pixel_height=None):
         
         cv2.imshow("HAWK3YE Object Detection", image_resized)
         cv2.waitKey(1) # Display for 1 ms
-        
-        # --- Using the object's height as the assumed wind turbine hub height ---
-        # This will be the reference height for the wind shear calculation
         hub_height_m = max(estimated_real_height, 30.0) # Assume at least 30m if detection fails
         
     # --- 3. WIND SHEAR CALCULATION ---
-    
-    # Assuming typical average wind speeds at a reference mast height (like 10m)
-    # In a real project, this data comes from a long-term measurement mast.
     REFERENCE_HEIGHT_M = 10.0
     AVERAGE_WIND_SPEED_REF_M_S = 6.5  # Example: 6.5 m/s at 10m height
-
-    # The Power Law for Wind Shear: V2 = V1 * (Z2 / Z1)^alpha
-    # We want to find the exponent 'alpha' that represents the site's terrain roughness.
-    
-    # For preliminary assessment, we can estimate roughness length (Z0) from terrain, 
-    # then calculate alpha. Given the complexity, we will use a simplified fixed 'alpha' 
-    # based on the *estimated terrain roughness* (e.g., Ramakkalmedu) 
-    
-    # Ramakkalmedu (India) is a hilly/mountainous region, which implies a higher surface roughness.
-    # Typical Roughness Length (Z0) for Open Terrain with scattered obstacles: ~0.05 - 0.2 m
-    # Let's assume a slightly rough terrain for the preliminary site.
     Z0_ROUGHNESS_M = 0.15 # Meters (e.g., for land with scattered trees/buildings)
-    
-    # The Power Law Exponent (alpha) can be approximated for a specific site from its roughness:
-    # A simplified formula for the Power Law Exponent 'alpha'
     alpha_exponent = 0.20 # A standard average value for hilly terrain/complex sites is often between 0.15 and 0.25
     
     # Calculate the projected wind speed at a common wind turbine hub height (e.g., 80m)
@@ -159,20 +113,9 @@ def main():
     print(f"\nFound {len(image_files)} images. Starting HAWK3YE Analysis...\n")
     
     analysis_results = []
-    
-    # --- IMPORTANT Calibration Step ---
-    # To perform the height calculation accurately, you MUST calibrate.
-    # This simulates a quick manual calibration from the first image:
     first_image_path = os.path.join(image_folder_path, image_files[0])
-    
-    # For a real project, this must be a pixel measurement of a known object (e.g., a 1m pole)
-    # This is a placeholder for the pixel height of the reference object as it appears in the RESIZED image (600px height).
-    # You would typically zoom in on the reference object in the first image and input its pixel height.
-    # For this script's demo purposes, we will assume a value.
-    # (If the 1m pole is 50 pixels high in the resized (800x600) image)
     REFERENCE_PIXEL_HEIGHT_DEMO = 50.0 
-    
-    # Run the analysis for all images
+
     for filename in image_files:
         full_path = os.path.join(image_folder_path, filename)
         status, result = estimate_height_and_wind_shear(full_path, REFERENCE_PIXEL_HEIGHT_DEMO)
@@ -192,4 +135,5 @@ def main():
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
+
     main()
