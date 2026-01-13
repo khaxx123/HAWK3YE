@@ -1,238 +1,216 @@
-README.md — HAWK3YE
-🚀 Overview
+# 🚁 HAWK3YE — Pre construction and mapping for setting up a  Wind Farm
 
-HAWK3YE is an aerial intelligence system designed to support pre-construction surveying for wind farm site selection.
-By integrating drone imagery, computer vision, and wind shear modeling, HAWK3YE evaluates whether a location has high potential for wind turbine installation.
+## 🌍 Overview
 
-This project contributes directly to UN SDG 7 – Affordable & Clean Energy, supporting India’s 500GW renewable mission.
-(Ref: Slides on SDG7 and preconstruction surveying — 
+**HAWK3YE** is an aerial intelligence system built to support **pre-construction surveying and site suitability analysis for wind farm development**.
 
-HAWK3YE_PRECONSTRUCTION MAPPING…
+By integrating **drone imagery**, **computer vision**, and **wind shear modeling**, HAWK3YE evaluates whether a given location has strong potential for wind turbine installation — *before* heavy investments are made.
 
-)
+This project aligns directly with **UN SDG 7 – Affordable & Clean Energy** and contributes to **India’s 500 GW renewable energy mission**, enabling smarter, data-driven renewable infrastructure planning.
 
-📌 Key Features
-1. Drone-Based Image Capture
+---
 
-360° coverage from a 45° camera angle
+## ✨ Key Features
 
-Images used for height estimation and wind shear analysis
-(Workflow from slides — 
+### 1️⃣ Drone-Based Image Capture
 
-HAWK3YE_PRECONSTRUCTION MAPPING…
+* 360° aerial coverage using drones
+* Optimized **45° camera tilt** for vertical object visibility
+* Captured images serve as inputs for height estimation and wind analysis
 
-)
+---
 
-2. Height Estimation Using Photogrammetry
+### 2️⃣ Height Estimation Using Photogrammetry
 
-Contour-based object detection
+* Contour-based object detection using OpenCV
+* Bounding box extraction for objects
+* **Reference-object-based scaling** for real-world measurement
+* Supports **turbine hub height estimation** from aerial images
 
-Reference-object-based scaling
+**Core Formula:**
+[\text{Real Height} = \frac{\text{Pixel Height (Object)}}{\text{Pixel Height (Reference)}} \times \text{Reference Height (m)}]
 
-Supports turbine hub height estimation
-(Code logic — 
+---
 
-program
+### 3️⃣ Wind Shear & Site Suitability Analysis
 
-)
+* Implements **power-law wind shear model**
+* Predicts wind speed at **80 m turbine hub height**
+* Automatically classifies sites as:
 
-3. Wind Shear & Site Suitability Analysis
+  * 🟢 **High Potential**
+  * 🟡 **Moderate Potential**
+  * 🔴 **Low Potential**
 
-Power law-based wind shear exponent
-
-Predicts wind speed at 80m hub height
-
-Labels site as High Potential, Moderate, or Low
-(Code: projected_wind_speed, alpha exponent — 
-
-program
-
-)
-
-4. Interactive Web Interface
-
-Upload multiple drone images
-
-Real-time previews
-
-AI-processed results visualized using charts & tables
-
-CSV export
-(Full frontend system — 
-
-html _ hawk3ye
-
-)
-
-🧠 System Architecture
-Drone → Image Capture → Python Backend (CV + Wind Model) →  
-Flask API → Interactive HTML/JS Dashboard → Site Analysis Report
-
-📁 Project Structure
-├── hawk3ye_survey.py        # Core backend processing (CV + wind modeling)
-├── index.html               # Frontend UI for uploads and visualization
-├── static/                  # (Optional) Images, CSS, JS
-├── templates/               # (If using Flask templating)
-├── HAWK3YE_Wind_Report.csv  # Generated output report
-└── README.md                # Project documentation
-
-⚙️ Installation
-Prerequisites
-
-Python 3.8+
-
-pip
-
-Any drone images in .jpg, .png
-
-Install Dependencies
-
-Run:
-
-pip install opencv-python numpy pandas flask
-
-🚀 Running the Backend
-python hawk3ye_survey.py
-
-
-This script will:
-
-Ask for folder path containing drone images
-
-Process each image (height + wind shear)
-
-Generate a CSV report: HAWK3YE_Wind_Farm_Survey_Report.csv
-(Report generation code — 
-
-program
-
-)
-
-🌐 Running the Frontend
-
-Open index.html in your browser.
-Front features include:
-
-Drag-and-drop uploads
-
-Preview grid
-
-Wind turbine animation during processing
-
-Wind speed vertical profile chart
-
-Result table displaying:
-
-Hub height
-
-Wind speed at 10m
-
-Expected speed at 80m
-
-Wind shear alpha
-
-Site suitability
-(All features defined in the HTML — 
-
-html _ hawk3ye
-
-)
-
-📊 Output
-
-The system generates:
-
-1. On-Screen Dashboard
-
-Hub height estimation
-
-Wind speed projection
-
-Suitability classification
-
-Full results table
-
-Wind speed profile chart
-
-2. CSV Report
-
-Contains:
-
-Image name
-
-Estimated hub height
-
-Wind speed @10m
-
-Wind speed @80m
-
-Wind shear exponent
-
-Suitability label
-(Backend CSV export — 
-
-program
-
-)
-
-🔍 Methodology
-1. Object Height Estimation
-
-Uses:
-
-Contour detection
-
-Bounding boxes
-
-Reference object scaling
-
-Conversion from pixel height → real height
-Formula (from code):
-
-Real Height = (PixelHeight_object / PixelHeight_reference) × ReferenceHeight_m
-
-2. Wind Shear Modeling
-
-Power-law equation used in the backend:
-
-V₂ = V₁ × (Z₂ / Z₁)^α
-
+**Wind Shear Equation:**
+[V_2 = V_1 \times (Z_2 / Z_1)^\alpha]
 
 Where:
 
-α = 0.20 (hilly terrain assumption — 
+* (\alpha = 0.20) (hilly terrain assumption)
+* (Z_1 = 10,m), (Z_2 = 80,m)
 
-program
+---
 
-)
+### 4️⃣ Interactive Web Interface
 
-Z₂ = 80m (hub height)
+* Drag-and-drop multiple image uploads
+* Real-time image previews
+* Animated turbine indicator during processing
+* Dynamic charts for wind-speed vertical profiles
+* Tabular result visualization
+* **CSV export for reports**
 
-3. Suitability Classification
+---
 
-High Potential: V₂ ≥ 6.0 m/s
+## 🧠 System Architecture
 
-Moderate/Low: otherwise
-(Code: suitability flag — 
+```
+Drone
+  ↓
+Image Capture
+  ↓
+Python Backend (Computer Vision + Wind Modeling)
+  ↓
+Flask API
+  ↓
+HTML / JavaScript Dashboard
+  ↓
+Wind Site Analysis Report
+```
 
-program
+---
 
-)
+## 📁 Project Structure
 
-🛠 Future Enhancements
+```
+HAWK3YE/
+├── hawk3ye_survey.py        # Core backend (CV + wind modeling)
+├── index.html               # Frontend UI & visualization
+├── static/                  # CSS, JS, images (optional)
+├── templates/               # Flask templates (optional)
+├── HAWK3YE_Wind_Report.csv  # Generated analysis report
+└── README.md                # Project documentation
+```
 
-YOLO-based turbine & reference object detection
+---
 
-True photogrammetry using structure-from-motion
+## ⚙️ Installation
 
-Real-time wind speed estimation using on-site sensors
+### 🔧 Prerequisites
 
-Integration into cloud dashboard for wind farm investors
+* Python **3.8+**
+* pip package manager
+* Drone images (`.jpg`, `.png`)
 
-👥 Team
+### 📦 Install Dependencies
 
-Khahini B I – Lead
+```bash
+pip install opencv-python numpy pandas flask
+```
 
-Shankar Durai N – Aerodynamics & Drone Systems
+---
 
-Siddharth K Ravani – Data & Deployment
+## 🚀 Running the Backend
+
+```bash
+python hawk3ye_survey.py
+```
+
+### Backend Workflow
+
+* Prompts for image folder path
+* Processes each image for:
+
+  * Object height estimation
+  * Wind shear calculation
+* Generates:
+
+  * **HAWK3YE_Wind_Farm_Survey_Report.csv**
+
+---
+
+## 🌐 Running the Frontend
+
+* Open `index.html` in any modern browser
+
+### Frontend Capabilities
+
+* Upload & preview drone images
+* Animated processing indicators
+* Wind-speed vertical profile chart
+* Results table showing:
+
+  * Estimated hub height
+  * Wind speed @ 10 m
+  * Wind speed @ 80 m
+  * Wind shear exponent
+  * Site suitability
+
+---
+
+## 📊 Output
+
+### 🖥 On-Screen Dashboard
+
+* Hub height estimation
+* Wind speed projection
+* Suitability classification
+* Visual charts & tables
+
+### 📄 CSV Report
+
+Each record includes:
+
+* Image name
+* Estimated hub height
+* Wind speed @ 10 m
+* Wind speed @ 80 m
+* Wind shear exponent (α)
+* Suitability label
+
+---
+
+## 🔍 Methodology Summary
+
+### Object Height Estimation
+
+* Contour detection
+* Bounding box analysis
+* Reference-based scaling
+* Pixel-to-meter conversion
+
+### Wind Modeling
+
+* Power-law based vertical wind profile
+* Terrain-aware wind shear assumption
+
+### Site Classification Logic
+
+* **High Potential:** (V_{80} \ge 6.0,m/s)
+* **Moderate / Low:** Below threshold
+
+---
+
+## 🛠 Future Enhancements
+
+* YOLO-based object & reference detection
+* True photogrammetry (Structure-from-Motion)
+* On-site sensor integration for real-time wind data
+* Cloud-based dashboard for investors & planners
+
+---
+
+## 👥 Team
+
+* **Khahini B I** — Project Lead & System Design
+* **Shankar Durai N** — Aerodynamics & Drone Systems
+* **Siddharth K Ravani** — Data Analytics & Deployment
+
+---
+
+## 📌 Vision
+
+*Measure before you build. Decide before you deploy.*
+**HAWK3YE** empowers renewable planners with aerial intelligence — turning pixels into power.
+
